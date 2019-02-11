@@ -2,10 +2,20 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const morgan = require('morgan')
 
 app.use(cors())
 app.use(bodyParser.json())
+morgan.token('body', (req) => {return JSON.stringify(req.body)})
+app.use(morgan(':method :url :status :res[content-lenght] - :responce-time ms :body'))
 app.use(express.static('build'))
+
+if ( process.argv.length<3 ) {
+  console.log('give password as argument')
+  process.exit(1)
+}
+
+const password = process.argv[2]
 
 let persons = [
   {
@@ -39,7 +49,9 @@ app.get('/', (req, res) => {
   })
   
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person.find({}).then(p => {
+      response.json(p.map(n => n.toJSON()))
+    });
   })
 
 app.get('/info', (req, res) => {
