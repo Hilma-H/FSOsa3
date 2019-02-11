@@ -64,9 +64,44 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end();
 })
 
+
 app.post('/api/persons', (request, response) => {
-  const person = request.body
-  console.log(person)
+    const body = request.body
+    console.log(body)
+    
+  if (body.name === undefined) {
+    return response.status(400).json({ 
+      error: 'name is missing' 
+    })
+  }
+  if (body.number === undefined){
+    return response.status(400).json({
+      error: 'number is missing'
+    })
+  }
+  
+  const sameName = persons.filter(p => p.name === body.name)
+  const sameNumber = persons.filter(p => p.number === body.number)
+  if(sameName.length > 0){
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+  if(sameNumber.length > 0){
+    return response.status(400).json({
+      error: 'number must be unique'
+    })
+  }
+
+
+  const randomId = Math.floor(Math.random()*100000)
+  console.log(randomId)
+  const person = {
+     id: randomId,
+     name: body.name,
+     number: body.number
+    }
+  persons = persons.concat(person)
 
   response.json(person)
 })
